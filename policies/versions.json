@@ -1,0 +1,23 @@
+{
+  "v1": {
+    "description": "Baseline: Cedar authz, heuristic injection detector, taint blocking, approvals, risk scoring",
+    "injection_detector": "heuristic",
+    "exfil_control": true,
+    "approvals": true,
+    "risk_scoring": true
+  },
+  "v2": {
+    "description": "v1 with the trained classifier replacing the heuristic detector",
+    "injection_detector": "classifier",
+    "exfil_control": true,
+    "approvals": true,
+    "risk_scoring": true
+  },
+  "v0": {
+    "description": "Authorization only, all guardrails off. Used as the no-guardrail baseline",
+    "injection_detector": "none",
+    "exfil_control": false,
+    "approvals": false,
+    "risk_scoring": false
+  }
+}
