@@ -1,0 +1,37 @@
+# Free, local-only stack. `docker compose up` starts Keycloak and the gateway.
+services:
+  keycloak-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes: [kcdb:/var/lib/postgresql/data]
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    command: start-dev --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    volumes: ["./infra/keycloak:/opt/keycloak/data/import:ro"]
+    ports: ["8080:8080"]
+    depends_on: [keycloak-db]
+
+  gateway:
+    build: .
+    environment:
+      WARDEN_KEYCLOAK_JWKS: http://keycloak:8080/realms/acme/protocol/openid-connect/certs
+      WARDEN_KEYCLOAK_ISSUER: http://localhost:8080/realms/acme
+      WARDEN_DB: /data/warden.duckdb
+    volumes: ["warden-data:/data"]
+    ports: ["8000:8000"]
+    depends_on: [keycloak]
+
+volumes:
+  kcdb:
+  warden-data:

@@ -1,0 +1,350 @@
+{
+  "realm": "acme",
+  "enabled": true,
+  "sslRequired": "none",
+  "accessTokenLifespan": 900,
+  "attributes": {
+    "acr.loa.map": "{\"pwd\": 1, \"passkey\": 2}",
+    "webAuthnPolicyUserVerificationRequirement": "required"
+  },
+  "roles": {
+    "realm": [
+      {
+        "name": "employee"
+      },
+      {
+        "name": "engineer"
+      },
+      {
+        "name": "finance"
+      },
+      {
+        "name": "hr"
+      },
+      {
+        "name": "manager"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "alice",
+      "enabled": true,
+      "email": "alice@acme.test",
+      "firstName": "Alice",
+      "lastName": "Acme",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "alice-dev-pass",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "employee",
+        "engineer"
+      ],
+      "attributes": {
+        "manager": [
+          "grace"
+        ],
+        "dept": [
+          "engineering"
+        ]
+      }
+    },
+    {
+      "username": "bob",
+      "enabled": true,
+      "email": "bob@acme.test",
+      "firstName": "Bob",
+      "lastName": "Acme",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "bob-dev-pass",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "employee",
+        "engineer"
+      ],
+      "attributes": {
+        "manager": [
+          "grace"
+        ],
+        "dept": [
+          "engineering"
+        ]
+      }
+    },
+    {
+      "username": "carol",
+      "enabled": true,
+      "email": "carol@acme.test",
+      "firstName": "Carol",
+      "lastName": "Acme",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "carol-dev-pass",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "employee",
+        "hr"
+      ],
+      "attributes": {
+        "manager": [
+          "heidi"
+        ],
+        "dept": [
+          "hr"
+        ]
+      }
+    },
+    {
+      "username": "dave",
+      "enabled": true,
+      "email": "dave@acme.test",
+      "firstName": "Dave",
+      "lastName": "Acme",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dave-dev-pass",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "employee",
+        "hr"
+      ],
+      "attributes": {
+        "manager": [
+          "heidi"
+        ],
+        "dept": [
+          "hr"
+        ]
+      }
+    },
+    {
+      "username": "erin",
+      "enabled": true,
+      "email": "erin@acme.test",
+      "firstName": "Erin",
+      "lastName": "Acme",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "erin-dev-pass",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "employee",
+        "finance"
+      ],
+      "attributes": {
+        "manager": [
+          "ivan"
+        ],
+        "dept": [
+          "finance"
+        ]
+      }
+    },
+    {
+      "username": "frank",
+      "enabled": true,
+      "email": "frank@acme.test",
+      "firstName": "Frank",
+      "lastName": "Acme",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "frank-dev-pass",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "employee",
+        "finance"
+      ],
+      "attributes": {
+        "manager": [
+          "ivan"
+        ],
+        "dept": [
+          "finance"
+        ]
+      }
+    },
+    {
+      "username": "grace",
+      "enabled": true,
+      "email": "grace@acme.test",
+      "firstName": "Grace",
+      "lastName": "Acme",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "grace-dev-pass",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "employee",
+        "engineer",
+        "manager"
+      ],
+      "attributes": {
+        "manager": [
+          "judy"
+        ],
+        "dept": [
+          "engineering"
+        ]
+      }
+    },
+    {
+      "username": "heidi",
+      "enabled": true,
+      "email": "heidi@acme.test",
+      "firstName": "Heidi",
+      "lastName": "Acme",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "heidi-dev-pass",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "employee",
+        "hr",
+        "manager"
+      ],
+      "attributes": {
+        "manager": [
+          "judy"
+        ],
+        "dept": [
+          "hr"
+        ]
+      }
+    },
+    {
+      "username": "ivan",
+      "enabled": true,
+      "email": "ivan@acme.test",
+      "firstName": "Ivan",
+      "lastName": "Acme",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "ivan-dev-pass",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "employee",
+        "finance",
+        "manager"
+      ],
+      "attributes": {
+        "manager": [
+          "judy"
+        ],
+        "dept": [
+          "finance"
+        ]
+      }
+    },
+    {
+      "username": "judy",
+      "enabled": true,
+      "email": "judy@acme.test",
+      "firstName": "Judy",
+      "lastName": "Acme",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "judy-dev-pass",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "employee",
+        "manager"
+      ],
+      "attributes": {
+        "manager": [
+          ""
+        ],
+        "dept": [
+          "executive"
+        ]
+      }
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "warden-gateway",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "redirectUris": [
+        "http://localhost:8000/*"
+      ],
+      "secret": "gateway-dev-secret",
+      "defaultClientScopes": [
+        "roles",
+        "profile"
+      ]
+    },
+    {
+      "clientId": "billing-svc",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "secret": "billing-dev-secret"
+    },
+    {
+      "clientId": "ticket-sync-svc",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "secret": "sync-dev-secret"
+    },
+    {
+      "clientId": "support-agent",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "secret": "support-dev-secret"
+    },
+    {
+      "clientId": "hr-assistant",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "secret": "hr-dev-secret"
+    },
+    {
+      "clientId": "research-agent",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "secret": "research-dev-secret"
+    }
+  ]
+}
