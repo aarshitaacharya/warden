@@ -44,7 +44,8 @@ class Warden:
         self.policy = PolicyEngine()
         self.log = DecisionLog(db_path)
         self.idp, self.verifier, self.sts = stack or build_dev_stack()
-        self.guard = None          # set by guardrails.attach() (Phase 3)
+        from .guardrails import Guardrails
+        self.guard = Guardrails(self)
 
     # -- identity helpers -------------------------------------------------
     def principals(self, ident: Identity) -> list[tuple[str, dict, str]]:
@@ -77,8 +78,12 @@ class Warden:
         rec = {"ts": now, "request_id": rid, "session_id": session_id, "policy_version": self.version,
                "action": action, "guardrails": [], "risk_signals": []}
 
+        ident = None
+
         def finish(status, decision, reason, data=None, **kw):
             rec.update(decision=decision, status=status, reason=reason)
+            if ident is not None:
+                self.guard.observe(ident, decision, now)
             rec["latency_ms"] = (time.perf_counter() - t0) * 1000
             self.log.write(rec)
             return Response(status, decision, reason, rid, data, guardrails=rec["guardrails"], **kw)
@@ -88,20 +93,18 @@ class Warden:
         try:
             ident = self.verifier.decode(token, cert_thumbprint=cert_thumbprint)
         except AuthError as e:
+            ident = None
             rec.update(principal_kind="unauthenticated", deciding_policies=["authn"])
             return finish(401, "deny", f"authn:{e.code}")
-        rec.update(principal_kind=ident.kind, principal_user=ident.subject if ident.kind != "service" else None,
+        rec.update(principal_kind=ident.kind, principal_user=ident.subject,
                    agent_id=ident.agent_id, token_jti=ident.jti, device_id=ident.device_id)
-        if ident.kind == "service":
-            rec["principal_user"] = ident.subject
-
         resource, record = tools.resource_entity(action, args, self.store)
         rid_str = f'{resource["uid"]["type"]}::{resource["uid"]["id"]}'
         rec.update(resource=rid_str, sensitivity=resource["attrs"].get("sensitivity"))
 
         # --- risk (guardrail) ---
         risk, signals = (0.0, [])
-        if self.guard and self.config.get("risk_scoring"):
+        if self.config.get("risk_scoring"):
             risk, signals = self.guard.risk(ident, action, session_id, now)
         rec.update(risk_score=risk, risk_signals=signals)
 
@@ -119,6 +122,7 @@ class Warden:
         rec["agent_decision"] = ("allow" if sides["agent"].allowed else "deny") if "agent" in sides else None
         policies = [p for ev in sides.values() for p in ev.policies]
         rec["deciding_policies"] = policies
+        rec["guardrails"].append({"name": "authz", "fired": failed is not None})
         if failed:
             side, ev = failed
             why = ",".join(ev.policies) or "default_deny"
@@ -127,11 +131,10 @@ class Warden:
             return finish(403, "deny", f"authz:{side}:{why}")
 
         # --- guardrails that act before execution ---
-        if self.guard:
-            verdict = self.guard.pre(self, ident, action, args, resource, session_id, now, approval_id, rec)
-            if verdict is not None:
-                return finish(verdict["status"], verdict["decision"], verdict["reason"],
-                              approval_id=verdict.get("approval_id"))
+        verdict = self.guard.pre(self, ident, action, args, resource, session_id, now, approval_id, rec)
+        if verdict is not None:
+            return finish(verdict["status"], verdict["decision"], verdict["reason"],
+                          approval_id=verdict.get("approval_id"))
 
         # --- execute ---
         try:
@@ -139,8 +142,17 @@ class Warden:
         except tools.ToolError as e:
             return finish(e.status, "allow", f"tool_error:{e.msg}")
 
-        if self.guard:
-            data, note = self.guard.post(self, ident, action, args, resource, data, session_id, now, rec)
-            if note:
-                return finish(200, "allow", note, data)
+        data, note = self.guard.post(self, ident, action, args, resource, data, session_id, now, rec)
+        if note:
+            return finish(200, "allow", note, data)
         return finish(200, "allow", "ok", data)
+
+    # -- approvals ----------------------------------------------------------
+    def decide_approval(self, approval_id: str, approver_token: str, approve: bool = True) -> dict:
+        from .guardrails.approvals import ApprovalError
+        ident = self.verifier.decode(approver_token)
+        try:
+            a = self.approvals.decide(approval_id, ident, approve)
+        except ApprovalError as e:
+            return {"ok": False, "error": str(e)}
+        return {"ok": True, "status": a.status, "approver": a.approver}

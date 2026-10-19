@@ -70,3 +70,16 @@ def revoke(kind: str, value: str, authorization: str | None = Header(None)):
     rl = warden.verifier.revocations
     {"token": rl.revoke_token, "user": rl.revoke_user, "agent": rl.revoke_agent}[kind](value)
     return {"revoked": {kind: value}}
+
+
+@app.post("/v1/approvals/{approval_id}/{verdict}")
+def decide(approval_id: str, verdict: str, authorization: str | None = Header(None)):
+    if verdict not in ("approve", "reject"):
+        raise HTTPException(404)
+    try:
+        out = warden.decide_approval(approval_id, _bearer(authorization), verdict == "approve")
+    except identity.AuthError as e:
+        raise HTTPException(401, e.code)
+    if not out["ok"]:
+        raise HTTPException(403, out["error"])
+    return out
