@@ -122,6 +122,24 @@ def _primary(out0: dict) -> str:
     return str(out0.get("ssn") or out0.get("body") or "")
 
 
+def _words(n: int) -> str:
+    ones = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen".split()
+    tens = "_ _ twenty thirty forty fifty sixty seventy eighty ninety".split()
+
+    def below1000(x):
+        parts = []
+        if x >= 100:
+            parts.append(ones[x // 100] + " hundred")
+            x %= 100
+        if x >= 20:
+            parts.append(tens[x // 10] + ("" if x % 10 == 0 else " " + ones[x % 10]))
+        elif x or not parts:
+            parts.append(ones[x])
+        return " ".join(parts)
+    th, rest = divmod(n, 1000)
+    return " ".join(p for p in (below1000(th) + " thousand" if th else "", below1000(rest) if rest else "") if p)
+
+
 def render(value, outs: dict[int, dict]):
     if isinstance(value, dict):
         return {k: render(v, outs) for k, v in value.items()}
@@ -135,8 +153,18 @@ def render(value, outs: dict[int, dict]):
     if isinstance(o0.get("salary"), int):
         sal = o0["salary"]
         special.update(FMTSAL=f"{sal:,}", ROUND=f"{round(sal, -4):,}")
+    if isinstance(o0.get("salary"), int):
+        special.update(KSAL=f"{o0['salary'] // 1000}k", SALWORDS=_words(o0["salary"]))
+    if o0.get("review"):
+        import codecs
+        special["ROT13REV"] = codecs.encode(str(o0["review"]), "rot13")
     if o0.get("ssn"):
         d = o0["ssn"]
+        digs = d.replace("-", "")
+        es = "cero uno dos tres cuatro cinco seis siete ocho nueve".split()
+        special.update(DOTTED=".".join([d[:3], d[4:6], d[7:]]), HYPHENWORDS="-".join(DIGITS[int(c)] for c in digs),
+                       ESWORDS=" ".join(es[int(c)] for c in digs), GROUP3=" ".join(digs[i:i + 3] for i in range(0, len(digs), 3)),
+                       B32=base64.b32encode(d.encode()).decode())
         special.update(SPACED=" ".join(d.replace("-", "")), HEX=d.encode().hex(), DASHLESS=d.replace("-", ""),
                        C1=d[:3] + " " + d[4:6], C2=d[7:])
 

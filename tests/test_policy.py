@@ -180,3 +180,10 @@ def test_every_denied_request_has_a_reason(w):
         r = call(w, tok, a)
         if r.decision == "deny":
             assert r.reason
+
+
+def test_record_without_manager_does_not_error(w):
+    # judy has no manager: the ReBAC rule must not raise an evaluation error for her record
+    r = call(w, w.idp.user_token("carol", passkey=True), "hr:read_record", {"user": "judy"})
+    assert r.decision == "allow" and "policy_error" not in r.reason
+    assert call(w, w.idp.user_token("judy"), "hr:read_record", {"user": "judy"}).decision == "allow"
