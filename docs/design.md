@@ -136,3 +136,10 @@ Each is listed under residual risk in the threat model.
 Everything runs locally or on free GitHub Actions: Keycloak and Postgres in
 Docker Compose, Cedar through `cedarpy`, DuckDB for storage, no paid API needed.
 The LLM detector is optional and off by default.
+
+## 11. As built (changes from the plan)
+
+- **Identity.** Keycloak authenticates humans and service accounts; its JWKS is trusted by the gateway (`warden/identity.py`, tested live in `tests/test_keycloak_integration.py`). Keycloak's standard token exchange has no actor claim, so agent delegation (RFC 8693 with `act`) is done by Warden's own STS. A built-in dev IdP with the same claim layout backs the unit tests. Passkey step-up is modelled with the `acr` claim; no passkey ceremony was run.
+- **Policy versions.** `v0` authorization only; `v1` heuristic detector; `v2` classifier; `v3` local Ollama judge; `v4` v2 plus digit-normalised taint matching, approval for external sends within 10 minutes of a sensitive read (any principal), and approval after 20 restricted reads in 15 minutes. `g-*` versions switch one guardrail on alone for ablation.
+- **Evaluation.** Three corpora: the first (107 attacks, 159 benign), a held-out hard set, and a second held-out set whose baseline was recorded before v4 existed. A real local model can act as the victim agent. See `eval/report.md` and `eval/report_hard.md`.
+- **Known holes.** Waiting out the 10 minute taint window defeats the tainted-send approval. Value-matching misses transformed values; only the approval covers those. Detection of injected text is unreliable on its own (see the reports).
