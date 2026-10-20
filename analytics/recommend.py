@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import difflib
 import json
+import time
 import shutil
 import tempfile
 from pathlib import Path
@@ -78,7 +79,8 @@ def replay(con, since_ts: float, role_actions: dict, agent_scopes: dict, service
     eng = _engine_with(role_actions)
     store = acme.fresh_store()
     rows = con.execute("""SELECT principal_kind, principal_user, agent_id, action, resource, decision, status, ts
-                          FROM decisions WHERE ts >= ? AND status IN (200, 403)""", [since_ts]).fetchall()
+                          FROM decisions WHERE ts >= ? AND status IN (200, 403)
+                          AND coalesce(reason, '') NOT LIKE 'risk:%' AND coalesce(reason, '') NOT LIKE '%abac-risk-deny%'""", [since_ts]).fetchall()
     broken, replayed = {}, 0
     for kind, user, agent, action, res, decision, status, ts in rows:
         rtype, _, rid = (res or "").partition("::")
@@ -86,7 +88,8 @@ def replay(con, since_ts: float, role_actions: dict, agent_scopes: dict, service
         if action not in acme.ACTIONS or rtype not in _ARG_KEY:
             continue
         resource, _ = tools.resource_entity(action, args, store)
-        ctx = {"risk_score": 0, "device_trusted": True, "stepped_up": True, "business_hours": True}
+        ctx = {"risk_score": 0, "device_trusted": True, "stepped_up": True,
+               "business_hours": 7 <= time.localtime(ts).tm_hour < 19}
         ents = eng.base_entities()
         sides = []
         if kind == "service":

@@ -1,0 +1,158 @@
+{
+  "timeline": [
+    {
+      "t": 60.0,
+      "kind": "baseline",
+      "detail": "hr-assistant reads two HR records for carol and sends nothing external"
+    },
+    {
+      "t": 3600.0,
+      "kind": "attack_start",
+      "detail": "stolen delegated token used from an unknown device (vps-185)"
+    },
+    {
+      "t": 3625.0,
+      "kind": "attack",
+      "detail": "read 6 HR records (within the agent's scope and carol's rights)",
+      "records": 6
+    },
+    {
+      "t": 3640.0,
+      "kind": "exfil_attempt",
+      "detail": "plain email: deny (guardrail:exfil_blocked:HRRecord::alice,HRRecord::grace)"
+    },
+    {
+      "t": 3644.0,
+      "kind": "exfil_attempt",
+      "detail": "base64 http: deny (authz:agent:default_deny)"
+    },
+    {
+      "t": 3648.0,
+      "kind": "exfil_attempt",
+      "detail": "ssn in subject: deny (guardrail:exfil_blocked:HRRecord::bob)"
+    },
+    {
+      "t": 3652.0,
+      "kind": "exfil_attempt",
+      "detail": "split value: deny (authz:agent:abac-risk-deny)"
+    },
+    {
+      "t": 3656.0,
+      "kind": "exfil_attempt",
+      "detail": "reversed value: deny (authz:agent:abac-risk-deny)"
+    },
+    {
+      "t": 3670.0,
+      "kind": "probe",
+      "detail": "finance:create_payment: deny (authz:agent:default_deny)"
+    },
+    {
+      "t": 3673.0,
+      "kind": "probe",
+      "detail": "hr:delete_record: deny (authz:agent:agent-no-destructive)"
+    },
+    {
+      "t": 3676.0,
+      "kind": "probe",
+      "detail": "hr:update_record: deny (authz:agent:default_deny)"
+    },
+    {
+      "t": 3679.0,
+      "kind": "probe",
+      "detail": "tickets:delete: deny (authz:agent:agent-no-destructive)"
+    },
+    {
+      "t": 3690.0,
+      "kind": "detection",
+      "detail": "alerts raised: DET-001(high), DET-003(medium), DET-004(medium)",
+      "alerts": 4
+    },
+    {
+      "t": 3810.0,
+      "kind": "contain",
+      "detail": "hr-assistant revoked by heidi (manager, passkey): all outstanding agent tokens invalid"
+    },
+    {
+      "t": 3815.0,
+      "kind": "verify",
+      "detail": "stolen token after revocation: 401 authn:agent_revoked",
+      "status": 401
+    },
+    {
+      "t": 3815.0,
+      "kind": "verify",
+      "detail": "legitimate token also revoked (expected, blunt): 401 authn:agent_revoked",
+      "status": 401
+    },
+    {
+      "t": 3815.0,
+      "kind": "tighten",
+      "detail": "removed comms:* from hr-assistant's maximum scopes; external send requires a new review"
+    },
+    {
+      "t": 4415.0,
+      "kind": "recover",
+      "detail": "fresh delegated token: read allow; email deny (authz:agent:default_deny)"
+    }
+  ],
+  "summary": {
+    "records_read_by_attacker": 6,
+    "external_messages_delivered": 0,
+    "exfil_attempts": [
+      {
+        "attempt": "plain email",
+        "decision": "deny",
+        "reason": "guardrail:exfil_blocked:HRRecord::alice,HRRecord::grace"
+      },
+      {
+        "attempt": "base64 http",
+        "decision": "deny",
+        "reason": "authz:agent:default_deny"
+      },
+      {
+        "attempt": "ssn in subject",
+        "decision": "deny",
+        "reason": "guardrail:exfil_blocked:HRRecord::bob"
+      },
+      {
+        "attempt": "split value",
+        "decision": "deny",
+        "reason": "authz:agent:abac-risk-deny"
+      },
+      {
+        "attempt": "reversed value",
+        "decision": "deny",
+        "reason": "authz:agent:abac-risk-deny"
+      }
+    ],
+    "alerts": [
+      {
+        "rule": "DET-001",
+        "severity": "high",
+        "identity": "agent:hr-assistant",
+        "evidence": "2 blocked outbound sends"
+      },
+      {
+        "rule": "DET-003",
+        "severity": "medium",
+        "identity": "agent:hr-assistant",
+        "evidence": "9 denials in 5 min"
+      },
+      {
+        "rule": "DET-004",
+        "severity": "medium",
+        "identity": "agent:hr-assistant",
+        "evidence": "read restricted data then comms:http_post (6 pairs)"
+      },
+      {
+        "rule": "DET-004",
+        "severity": "medium",
+        "identity": "agent:hr-assistant",
+        "evidence": "read restricted data then comms:send_email (24 pairs)"
+      }
+    ],
+    "seconds_attack_start_to_detection": 90.0,
+    "seconds_detection_to_containment": 120,
+    "chain_intact": true
+  }
+}

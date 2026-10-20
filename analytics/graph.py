@@ -54,6 +54,8 @@ def build(role_actions: dict | None = None, agent_scopes: dict | None = None) ->
     for r, acts in ra.items():
         for a in acts:
             g.add_edge(f"role:{r}", f"action:{a}", rel="permits")
+    for n in g:
+        g.nodes[n].setdefault("kind", n.split(":", 1)[0])
     return g
 
 

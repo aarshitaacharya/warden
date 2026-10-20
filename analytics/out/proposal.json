@@ -1,0 +1,40 @@
+{
+  "roles": {
+    "employee": [
+      "docs:read"
+    ],
+    "engineer": [
+      "tickets:read",
+      "tickets:update"
+    ],
+    "hr": [
+      "hr:read_record"
+    ],
+    "finance": [
+      "finance:read_report"
+    ],
+    "manager": [
+      "tickets:read"
+    ]
+  },
+  "agents": {
+    "support-agent": [
+      "docs:read",
+      "tickets:read"
+    ],
+    "hr-assistant": [
+      "hr:read_record"
+    ],
+    "research-agent": [
+      "docs:read"
+    ]
+  },
+  "services": {
+    "billing-svc": [
+      "finance:read_report"
+    ],
+    "ticket-sync-svc": [
+      "tickets:read"
+    ]
+  }
+}

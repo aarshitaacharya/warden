@@ -1,0 +1,41 @@
+--- a/agent-scopes.json
++++ b/agent-scopes.json
+@@ -1,21 +1,12 @@
+ {
+   "support-agent": [
+     "docs:read",
+-    "hr:read_record",
+-    "tickets:create",
+-    "tickets:read",
+-    "tickets:update"
++    "tickets:read"
+   ],
+   "hr-assistant": [
+-    "comms:send_email",
+-    "docs:read",
+-    "hr:read_record",
+-    "tickets:create"
++    "hr:read_record"
+   ],
+   "research-agent": [
+-    "comms:http_post",
+-    "comms:send_email",
+-    "docs:read",
+-    "tickets:read"
++    "docs:read"
+   ]
+ }
+--- a/service-scopes.json
++++ b/service-scopes.json
+@@ -1,10 +1,8 @@
+ {
+   "billing-svc": [
+-    "finance:create_payment",
+     "finance:read_report"
+   ],
+   "ticket-sync-svc": [
+-    "tickets:read",
+-    "tickets:update"
++    "tickets:read"
+   ]
+ }

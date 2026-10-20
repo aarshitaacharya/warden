@@ -1,0 +1,7 @@
+# Resume bullets (numbers come from the committed reports; re-check them after any change)
+
+- Built **Warden**, a zero-trust access broker (Python, FastAPI, Cedar, Keycloak, DuckDB) that issues short-lived, scoped agent identities via OAuth token exchange (RFC 8693) and enforces RBAC, ABAC and ReBAC with an agent-scope-intersect-user rule, logging every decision to a hash-chained audit table.
+- Authored a 107-scenario red-team corpus and 159-task benign corpus for AI-agent attacks (indirect prompt injection, confused deputy, privilege escalation, exfiltration chains); authorization alone let 51% of attacks execute, the full guardrail stack let 0%, while breaking 5% of benign tasks.
+- Measured each control in isolation with precision, recall and F1 and Wilson/bootstrap confidence intervals; a trained injection classifier raised detection from 58% to 75% of poisoned tool outputs (+17.5 points, 95% CI [+7.5, +30.0]) over a heuristic baseline, with fewer false blocks.
+- Built DuckDB/SQL access analytics and NetworkX attack-path graphs to find unused permissions, dormant agents and agent exfiltration paths, then auto-generated least-privilege policy diffs validated by holdout log replay, plus a CI gate (GitHub Actions) that fails builds when recall drops or false blocks rise.
+- Ran and documented a simulated compromised-agent incident: detection in 90 simulated seconds, token revocation and scope reduction, zero data delivered externally, and a postmortem listing what still failed.

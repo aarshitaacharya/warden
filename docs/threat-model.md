@@ -85,7 +85,40 @@ narrow scope, revocation, no refresh token issued.
 3. Decision log integrity.
 4. Confidential docs.
 
-## 5. Re-assessment (to be completed in Phase 6)
+## 5. Re-assessment (after the build)
 
-Filled in after the build: what changed against the plan, what the measurements
-showed, and which risks remain open.
+Measured against the 107-scenario red-team corpus and the simulated incident. See `eval/report.md`
+and `docs/incident-postmortem.md`. Scenario results are on a synthetic, defender-authored corpus,
+so "mitigated" means "stopped in our tests", not "proven".
+
+| # | Threat | Result | What changed from the plan |
+|---|---|---|---|
+| S1 | Stolen user token | Partly mitigated | Revocation and short life work. Tokens are not sender-constrained, so reuse from a new device is only a risk signal. |
+| S2 | Agent credential used directly | Mitigated | 1 scenario, rejected as `agent_credential_not_accepted`. |
+| S3 | Forged token, `alg=none`, untrusted issuer | Mitigated | 4 scenarios plus unit tests. |
+| S4 | Service token replay | Mitigated | Certificate binding implemented; tested at unit level only (no real mTLS terminator). |
+| T2 | Policy tampering | Partly mitigated | Policies tested in CI; no signed policy bundles. |
+| T3 | Log tampering | Mitigated for detection | Hash chain detects edits and is verified in tests. It does not prevent deletion of a whole tail. Anchoring the head hash externally is open. |
+| R1 | Repudiated approval | Mitigated | Approver identity and acr stored; requester cannot approve; approval bound to the arguments and single use. |
+| D1 | Request floods | Partly mitigated | Burst signal feeds risk. No hard rate limit. |
+| E1 | Role confusion | Mitigated | Authorization alone stopped all 30 confused-deputy and privilege scenarios. |
+| E2 | Agent exceeds its user | Mitigated | Intersection invariant checked in tests and on the attack-path graph. |
+| E3 | Self-approval | Mitigated | All 8 approval-bypass scenarios stopped (self-approval, non-manager, replay, mutated arguments, no passkey). |
+| A1 | Indirect prompt injection | **Partly mitigated** | Heuristic detector caught 57.5% of poisoned outputs, classifier 75%, and both false-block benign security text (8.2% and 5.0% of benign tasks). Detection alone is not trustworthy. |
+| A2 | Confused deputy | Mitigated | 12 scenarios, all denied on the user side. |
+| A3 | Over-privilege | Detected, not prevented | Analytics found unused agent scopes and generated reductions. Applying them is a manual step. |
+| A4 | Exfiltration | **Partly mitigated** | Taint blocked 12 of 15 exfil attacks that authorization alone allowed. Reversed, split and paraphrased values evade it. Approval for agent-originated external sends and risk scoring covered those in the corpus. |
+| A5 | Tool-sequence abuse | Partly mitigated | Only the read-then-outbound sequence is modelled. |
+| A6 | Agent token theft | Partly mitigated | 5 minute life and revocation; see S1. |
+
+### New risks found during the build
+
+- **Defence overlap hides weak layers.** End-to-end attack success was 0 for both v1 and v2, but the isolated tests show the injection detector alone misses 7 (heuristic) or 1 (classifier) of 24 attacks that authorization lets through. A single layer failing is invisible in the headline number.
+- **Quarantine is a denial of service on content.** Every false positive withholds a legitimate document from an agent.
+- **Hash-chain tail truncation** (above).
+- **Simulated victim agent.** Real LLMs may ignore injections the scripted agent obeys, or comply with ones it never sees.
+- **Replay fidelity.** Policy replay approximates context (device, risk) that the log does not store in full.
+
+### Residual risks accepted
+
+Novel injection phrasing and non-text payloads, paraphrased exfiltration, device attestation fidelity, key management (keys live in process memory in this build), multi-tenant isolation.

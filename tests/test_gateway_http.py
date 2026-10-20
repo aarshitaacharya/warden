@@ -25,3 +25,10 @@ def test_bad_exchange_is_400():
     r = c.post("/sts/exchange", data={"grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
                                       "subject_token": w.idp.user_token("alice"), "actor_token": w.idp.user_token("bob")})
     assert r.status_code == 400
+
+
+def test_dashboard():
+    c = TestClient(gateway.app)
+    assert c.get("/dashboard").status_code == 200
+    d = c.get("/dashboard/data").json()
+    assert "counts" in d and d["chain_ok"] is True
