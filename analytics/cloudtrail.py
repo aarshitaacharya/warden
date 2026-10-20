@@ -41,12 +41,18 @@ def tbl(rows, cols):
 def main():
     if not SRC.exists():
         raise SystemExit("run scripts/fetch_flaws.sh first")
-    DB.unlink(missing_ok=True)
+    import sys
+    if "--reload" in sys.argv:
+        DB.unlink(missing_ok=True)
     con = duckdb.connect(str(DB))
-    load(con)
+    if not con.execute("select count(*) from information_schema.tables where table_name='cloudtrail'").fetchone()[0]:
+        load(con)
     n, t0, t1, p = con.execute("select count(*), min(ts), max(ts), count(distinct principal) from cloudtrail").fetchone()
     L = ["# CloudTrail analysis (flaws.cloud public dataset)\n",
-         f"{n:,} events, {t0} to {t1}, {p:,} distinct principals. Loaded by `python -m analytics.cloudtrail`.\n"]
+         f"{n:,} events, {t0} to {t1}, {p:,} distinct principals. Loaded by `python -m analytics.cloudtrail`.\n",
+         "> Caveat: flaws.cloud is a security CTF, so most of this traffic is players enumerating the API with leaked keys. "
+         "It is a good scale and anomaly test, but 'observed usage' here is attacker behaviour, not a healthy baseline. "
+         "A least-privilege policy built from it would freeze that behaviour in.\n"]
 
     L += ["## Who calls the API\n", tbl(con.execute("""select id_type, count(*) n, count(distinct principal) principals
                  from cloudtrail group by 1 order by n desc""").fetchall(), ["identity type", "events", "principals"])]
@@ -66,13 +72,13 @@ def main():
               ["principal", "events", "denied", "% denied"])]
 
     L += ["## Daily volume spikes (z-score >= 3 against the principal's own days)\n",
-          tbl(con.execute("""with d as (select principal, cast(ts as date) day, count(*) n from cloudtrail group by 1, 2),
-                 s as (select principal, avg(n) mu, stddev_pop(n) sd, count(*) days from d group by 1)
+          tbl(con.execute("""with d as (select principal, cast(ts as date) as day, count(*) n from cloudtrail group by 1, 2),
+                 s as (select principal, avg(n) mu, stddev_pop(n) sd, count(*) as ndays from d group by 1)
                  select d.principal, d.day, d.n, round((d.n - s.mu) / s.sd, 1) z from d join s using (principal)
-                 where s.days >= 3 and s.sd > 0 and (d.n - s.mu) / s.sd >= 3 order by z desc limit 10""").fetchall(),
+                 where s.ndays >= 3 and s.sd > 0 and (d.n - s.mu) / s.sd >= 3 order by z desc limit 10""").fetchall(),
               ["principal", "day", "events", "z"])]
 
-    L += ["## Unusual user agents\n",
+    L += ["## Clients (user agent family)\n",
           tbl(con.execute("""select ua, count(*) n, count(distinct principal) principals from cloudtrail
                  group by 1 order by n asc limit 0""").fetchall(), ["ua", "events", "principals"]) if False else "",
           tbl(con.execute("""select regexp_extract(ua, '^[^ /]+', 0) client, count(*) n, count(distinct principal) principals
