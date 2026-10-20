@@ -6,7 +6,7 @@ permit(principal in Role::"employee",
 
 @id("rbac-engineer")
 permit(principal in Role::"engineer",
-       action in [Action::"tickets:read", Action::"tickets:update", Action::"docs:write"],
+       action in [Action::"tickets:read", Action::"tickets:update", Action::"docs:write", Action::"comms:http_post"],
        resource);
 
 @id("rbac-hr")

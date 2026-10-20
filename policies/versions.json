@@ -19,5 +19,40 @@
     "exfil_control": false,
     "approvals": false,
     "risk_scoring": false
+  },
+  "g-heuristic": {
+    "injection_detector": "heuristic",
+    "exfil_control": false,
+    "approvals": false,
+    "risk_scoring": false,
+    "description": "Isolated: heuristic injection detector only"
+  },
+  "g-classifier": {
+    "injection_detector": "classifier",
+    "exfil_control": false,
+    "approvals": false,
+    "risk_scoring": false,
+    "description": "Isolated: classifier injection detector only"
+  },
+  "g-exfil": {
+    "injection_detector": "none",
+    "exfil_control": true,
+    "approvals": false,
+    "risk_scoring": false,
+    "description": "Isolated: taint/exfil control only"
+  },
+  "g-approval": {
+    "injection_detector": "none",
+    "exfil_control": false,
+    "approvals": true,
+    "risk_scoring": false,
+    "description": "Isolated: human approval only"
+  },
+  "g-risk": {
+    "injection_detector": "none",
+    "exfil_control": false,
+    "approvals": false,
+    "risk_scoring": true,
+    "description": "Isolated: risk scoring only"
   }
 }

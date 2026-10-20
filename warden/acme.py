@@ -36,7 +36,7 @@ USERS = {
 # Role -> actions (RBAC). Enforced in Cedar; mirrored here for analytics and tests.
 ROLE_ACTIONS = {
     "employee": ["tickets:create", "docs:read", "comms:send_email"],
-    "engineer": ["tickets:read", "tickets:update", "docs:write"],
+    "engineer": ["tickets:read", "tickets:update", "docs:write", "comms:http_post"],
     "hr": ["hr:read_record", "hr:update_record", "tickets:read"],
     "finance": ["finance:read_report", "finance:create_payment"],
     "manager": ["tickets:read", "tickets:delete"],

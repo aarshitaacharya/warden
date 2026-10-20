@@ -39,7 +39,7 @@ def agent(w, user, agent_id, scope="", **kw):
 # --- RBAC -----------------------------------------------------------------
 # Expected: for the given user (passkey + trusted device), which actions are allowed on ARGS.
 RBAC_EXPECTED = {
-    "alice": {"tickets:read", "tickets:create", "tickets:update", "docs:read", "docs:write", "comms:send_email"},
+    "alice": {"tickets:read", "tickets:create", "tickets:update", "docs:read", "docs:write", "comms:send_email", "comms:http_post"},
     "carol": {"tickets:read", "tickets:create", "docs:read", "comms:send_email", "hr:read_record", "hr:update_record"},
     "erin": {"tickets:create", "docs:read", "comms:send_email", "finance:read_report", "finance:create_payment"},
 }
