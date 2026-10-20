@@ -58,7 +58,7 @@ def charts(summary, styles_h, styles_c, effects):
     ax.set_ylim(0, max(vals) * 1.2 + 5)
     ax.yaxis.grid(True, color=grid); ax.set_axisbelow(True)
     ax.set_title("End-to-end attack success by control stack", loc="left", color=ink)
-    fig.tight_layout(); fig.savefig(ROOT / "docs/img/attack_success.png", dpi=160); plt.close(fig)
+    fig.tight_layout(); fig.savefig(ROOT / "docs/img/attack_success.png", dpi=160, bbox_inches="tight"); plt.close(fig)
 
     names = sorted(set(styles_h) | set(styles_c))
     fig, ax = plt.subplots(figsize=(6.8, 3.6))
@@ -72,9 +72,9 @@ def charts(summary, styles_h, styles_c, effects):
     ax.set_xticks(range(len(names))); ax.set_xticklabels(names)
     ax.set_ylabel("poisoned outputs detected (%)"); ax.set_ylim(0, 112)
     ax.yaxis.grid(True, color=grid); ax.set_axisbelow(True)
-    ax.legend(frameon=False, loc="lower left")
+    ax.legend(frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.12), ncol=2)
     ax.set_title("Injection detector recall by payload style", loc="left", color=ink)
-    fig.tight_layout(); fig.savefig(ROOT / "docs/img/detector_recall.png", dpi=160); plt.close(fig)
+    fig.tight_layout(); fig.savefig(ROOT / "docs/img/detector_recall.png", dpi=160, bbox_inches="tight"); plt.close(fig)
 
     gs = list(effects)
     fig, ax = plt.subplots(figsize=(6.8, 3.6))
@@ -87,9 +87,9 @@ def charts(summary, styles_h, styles_c, effects):
     ax.set_xticks(range(len(gs))); ax.set_xticklabels(gs)
     ax.set_ylim(0, 112); ax.set_ylabel("%")
     ax.yaxis.grid(True, color=grid); ax.set_axisbelow(True)
-    ax.legend(frameon=False, loc="lower left")
+    ax.legend(frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.12), ncol=2)
     ax.set_title("Each guardrail added alone to authorization", loc="left", color=ink)
-    fig.tight_layout(); fig.savefig(ROOT / "docs/img/guardrails.png", dpi=160); plt.close(fig)
+    fig.tight_layout(); fig.savefig(ROOT / "docs/img/guardrails.png", dpi=160, bbox_inches="tight"); plt.close(fig)
 
 
 def main():
