@@ -108,7 +108,6 @@ so "mitigated" means "stopped in our tests", not "proven".
 | A2 | Confused deputy | Mitigated | 12 scenarios, all denied on the user side. |
 | A3 | Over-privilege | Detected, not prevented | Analytics found unused agent scopes and generated reductions. Applying them is a manual step. |
 | A4 | Exfiltration | **Partly mitigated; open gap** | On the hard set, 6 insider-exfiltration variants that reformat the value (number format, spelled digits, paraphrase, chunking, translation) evade taint, and human senders need no approval. 7 of 40 hard attacks still execute. |
-| A4a | (original corpus) | | | Taint blocked 12 of 15 exfil attacks that authorization alone allowed. Reversed, split and paraphrased values evade it. Approval for agent-originated external sends and risk scoring covered those in the corpus. |
 | A5 | Tool-sequence abuse | Partly mitigated | Only the read-then-outbound sequence is modelled. |
 | A6 | Agent token theft | Partly mitigated | 5 minute life and revocation; see S1. |
 
