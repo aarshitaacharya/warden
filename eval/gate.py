@@ -16,8 +16,11 @@ THRESH = json.loads((Path(__file__).parent / "thresholds.json").read_text())
 def main() -> int:
     failures = []
     for key, t in THRESH.items():
-        v, hard = key.removesuffix("-hard"), key.endswith("-hard")
-        atk, ben = (h.load("attacks_hard"), h.load("benign_hard")) if hard else (h.load("attacks"), h.load("benign"))
+        v, _, suffix = key.partition("-hard")
+        name = {"": "", "2": "_hard2"}[suffix] if "-hard" in key else ""
+        if "-hard" in key and suffix == "":
+            name = "_hard"
+        atk, ben = h.load("attacks" + name), h.load("benign" + name)
         a, b = h.run_corpus(v, atk), h.run_corpus(v, ben)
         asr = sum(o.harm_executed for o in a) / len(a)
         fbr = sum(not o.completed for o in b) / len(b)

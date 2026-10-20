@@ -107,7 +107,7 @@ so "mitigated" means "stopped in our tests", not "proven".
 | A1 | Indirect prompt injection | **Partly mitigated** | First corpus: heuristic caught 57.5% of poisoned outputs, classifier 75%. Held-out hard set plus first set: heuristic 44.8%, classifier 89.6% (least trustworthy: same author as the attacks), local LLM judge 41.8% with 0 false positives. Split, diluted and request-shaped payloads defeat the LLM judge entirely. A real model obeyed 30% of injections with no Warden. Detection alone is not trustworthy; taint and approvals carry the end-to-end result. |
 | A2 | Confused deputy | Mitigated | 12 scenarios, all denied on the user side. |
 | A3 | Over-privilege | Detected, not prevented | Analytics found unused agent scopes and generated reductions. Applying them is a manual step. |
-| A4 | Exfiltration | **Partly mitigated; open gap** | On the hard set, 6 insider-exfiltration variants that reformat the value (number format, spelled digits, paraphrase, chunking, translation) evade taint, and human senders need no approval. 7 of 40 hard attacks still execute. |
+| A4 | Exfiltration | **Mitigated with friction; one known hole** | Hard set: 6 reformatted-value variants evaded taint (7 of 40 executed). v4 added digit normalisation, approval for any external send within 10 minutes of a sensitive read, and bulk-read approval; on a second held-out set it took 14/21 to 0/21 executed at the cost of 3 extra benign approvals. Waiting out the 10 minute window still defeats it. |
 | A5 | Tool-sequence abuse | Partly mitigated | Only the read-then-outbound sequence is modelled. |
 | A6 | Agent token theft | Partly mitigated | 5 minute life and revocation; see S1. |
 

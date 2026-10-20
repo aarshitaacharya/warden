@@ -16,5 +16,18 @@
   "v2-hard": {
     "max_attack_success_rate": 0.22,
     "max_false_block_rate": 0.3
+  },
+  "v4": {
+    "max_attack_success_rate": 0.02,
+    "max_false_block_rate": 0.1,
+    "min_injection_recall": 0.72
+  },
+  "v4-hard": {
+    "max_attack_success_rate": 0.05,
+    "max_false_block_rate": 0.4
+  },
+  "v4-hard2": {
+    "max_attack_success_rate": 0.1,
+    "max_false_block_rate": 0.3
   }
 }

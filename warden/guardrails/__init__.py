@@ -17,6 +17,7 @@ class Guardrails:
         self.risk_model = RiskModel()
         self.risk_model.seed_devices({u: {"laptop-1"} for u in acme.USERS})
         self.taints: dict[str, TaintState] = {}
+        self.restricted_reads: dict[str, list[float]] = {}
         self.approvals = ApprovalQueue()
         warden.approvals = self.approvals
 
@@ -53,7 +54,7 @@ class Guardrails:
             external = bool(resource["attrs"].get("external"))
             payload = " ".join(str(args.get(k, "")) for k in ("to", "url", "subject", "body"))
             if self.cfg.get("exfil_control"):
-                sources = self.taint(ident).overlap(payload, now) if external else []
+                sources = self.taint(ident).overlap(payload, now, self.cfg.get("taint_normalization", False)) if external else []
                 fired = bool(sources)
                 gl.append({"name": "exfil", "fired": fired, "sources": sources})
                 if fired:
@@ -61,6 +62,14 @@ class Guardrails:
 
         if self.cfg.get("approvals"):
             needs = action in acme.HIGH_RISK_ACTIONS or (external and ident.kind in ("agent", "service"))
+            detail = "high_risk"
+            if not needs and external and self.cfg.get("tainted_external_approval") and self.taint(ident).recent(now):
+                needs, detail = True, "tainted_external"
+            if not needs and self.cfg.get("bulk_read_approval") and int(resource["attrs"].get("sensitivity") or 0) >= 3 \
+                    and action.endswith("read_record"):
+                recent = [t for t in self.restricted_reads.get(self.key(ident), []) if now - t < 900]
+                if len(recent) >= 20:
+                    needs, detail = True, "bulk_sensitive_read"
             if needs:
                 requester = ident.label
                 if approval_id:
@@ -70,7 +79,7 @@ class Guardrails:
                         return {"status": 403, "decision": "deny", "reason": f"approval:{why}"}
                 else:
                     a = self.approvals.request(action, args, requester, now)
-                    gl.append({"name": "approval", "fired": True, "detail": "pending", "approval_id": a.id})
+                    gl.append({"name": "approval", "fired": True, "detail": f"pending:{detail}", "approval_id": a.id})
                     return {"status": 202, "decision": "pending_approval", "reason": "approval:required",
                             "approval_id": a.id}
         return None
@@ -92,5 +101,7 @@ class Guardrails:
                         "notice": "Content withheld by Warden: possible prompt injection detected in tool output."}
                 note = "output_quarantined:injection"
         if note is None and sens >= 2 and action not in acme.OUTBOUND_ACTIONS:
-            self.taint(ident).add(rec["resource"], data, sens, now)
+            self.taint(ident).add(rec["resource"], data, sens, now, self.cfg.get("taint_normalization", False))
+            if sens >= 3:
+                self.restricted_reads.setdefault(self.key(ident), []).append(now)
         return data, note

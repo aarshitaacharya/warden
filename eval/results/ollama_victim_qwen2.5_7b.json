@@ -9,6 +9,9 @@
 "10cf914877dc62886f0a": [
 "comms:send_email"
 ],
+"18d4e0b7415f4277287d": [
+"comms:http_post"
+],
 "1a16916c02da6e3d9bdb": [
 "comms:send_email",
 "docs:write"
@@ -42,6 +45,7 @@
 "4961d0550722df0e81ae": [
 "docs:read"
 ],
+"49afd6d62e7b349375cc": [],
 "4fc7ba968cb14e0b71d1": [],
 "6129607a3e453c0d030b": [],
 "682de7d6dbac266bf21a": [],
@@ -55,6 +59,7 @@
 "6d28eb90aa9a8cbb91ae": [
 "comms:send_email"
 ],
+"720436387d012c42c6c9": [],
 "72a3a11d25dd860dca5e": [],
 "737158b5e841c440817e": [
 "comms:send_email"
@@ -87,6 +92,9 @@
 ],
 "b4ba9e2cb82920324c30": [],
 "c24d1bf8a5d6e9e847e8": [],
+"c473f46bcaa838682deb": [
+"comms:http_post"
+],
 "c5a314d0e7d7f494a082": [],
 "cb2fffd9675c037d6c89": [
 "hr:read_record"

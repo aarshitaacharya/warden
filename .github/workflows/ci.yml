@@ -16,6 +16,7 @@ jobs:
         run: |
           python -m eval.corpus
           python -m eval.corpus_hard
+          python -m eval.corpus_hard2
           git diff --exit-code eval/corpus
       - name: Red-team gate (fails if recall drops or false blocks rise)
         run: python -m eval.gate

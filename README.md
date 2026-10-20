@@ -72,11 +72,22 @@ Zero attacks executing on the first corpus came from overlapping layers and from
 | Hard attacks executed | 37/40 | 7/40 (17.5%) | 7/40 (17.5%) | 7/40 (17.5%) |
 | Hard benign tasks broken | 0/34 | 10/34 | 8/34 | 0/34 |
 
-The 7 that get through are not injections: insider exfiltration that reformats the value (number formatting, spelled-out digits, paraphrase, chunking, translation) and two low-and-slow scraping runs. Value matching and the behavioural score both miss them, and nothing else covers a human sending external mail. That is an open gap.
+The 7 that get through are not injections: insider exfiltration that reformats the value (number formatting, spelled-out digits, paraphrase, chunking, translation) and two low-and-slow scraping runs.
 
-Detectors alone, original plus hard sets (scan level): heuristic recall 44.8% / FPR 14.0%; classifier recall 89.6% / FPR 12.9%; local `qwen2.5:7b` judge via Ollama recall 41.8% / FPR 0%. The classifier's high recall is the least trustworthy number here, because I wrote its training data and the attacks. The LLM judge never false-blocks but misses split, dilution and customer-voice payloads entirely.
+### Hardening v4, measured on a second held-out set
 
-With a real model as the victim (qwen2.5:7b deciding whether to obey), 30.4% of injection scenarios executed with authorization alone and 0% with any Warden stack. Part of that is the detector and part is taint tracking, so removing approvals and taint (ablation rows in the report) is what exposes the detector's own gaps.
+I wrote a second set (`eval/corpus_hard2.py`, 21 attacks, 27 benign) and recorded its baseline **before** implementing the fix, then ran the fix against it once. v4 adds digit-normalised taint matching, an approval for any external send within 10 minutes of a sensitive read (humans included), and an approval after 20 restricted reads in 15 minutes.
+
+| Second held-out set | v2 | v4 |
+|---|---|---|
+| Attacks executed | 14/21 (66.7%) | 0/21 (0%), 95% CI [0, 15.5] |
+| Benign tasks broken | 3/27 | 6/27 (22.2%) |
+
+Where the gain comes from: normalisation alone stops 10 of 21; the content-independent tainted-send approval stops 16; bulk-read approval is the only thing that stops the slow scraping. The price is friction: 3 benign "read a record, then email an outsider something unrelated" tasks now wait for approval, and the classifier's false blocks on security prose are unchanged. A hole remains: an attacker who waits more than 10 minutes between reading and sending is not caught (checked ad hoc, not in the corpus). On this size of corpus the confidence interval on 0/21 still allows up to about 15%.
+
+Detectors alone, all three corpora combined (scan level): heuristic recall 46.5% / FPR 14.6%; classifier recall 90.1% / FPR 13.8%; local `qwen2.5:7b` judge via Ollama recall 42.3% / FPR 0%. The classifier's high recall is the least trustworthy number here, because I wrote its training data and the attacks. The LLM judge never false-blocks but misses split, dilution and customer-voice payloads entirely.
+
+With a real model as the victim (qwen2.5:7b deciding whether to obey), 31.5% of 73 injection scenarios executed with authorization alone and 0% with any Warden stack. Part of that is the detector and part is taint tracking, so removing approvals and taint (ablation rows in the report) is what exposes the detector's own gaps.
 
 From `analytics/report.md` (simulated month of traffic): agents and users used 12 to 50 percent of the permissions they were granted; the generated least-privilege proposal, learned on 20 days, would have broken 8 of 441 requests in the last 10 days (all one legitimate change in behaviour, caught by replay); 20 agent/user pairs could read sensitive data and send it outside, 0 after the proposal. See `analytics/cloudtrail_report.md` for the same analysis on the public flaws.cloud CloudTrail dataset.
 

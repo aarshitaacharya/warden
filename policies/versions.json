@@ -89,5 +89,39 @@
     "approvals": false,
     "risk_scoring": false,
     "description": "Isolated: Ollama LLM detector only"
+  },
+  "v4": {
+    "description": "v2 plus digit-normalised taint matching, approval for external sends after a sensitive read (any principal), and approval for bulk restricted reads",
+    "injection_detector": "classifier",
+    "exfil_control": true,
+    "approvals": true,
+    "risk_scoring": true,
+    "taint_normalization": true,
+    "tainted_external_approval": true,
+    "bulk_read_approval": true
+  },
+  "g-normalize": {
+    "injection_detector": "none",
+    "exfil_control": true,
+    "approvals": false,
+    "risk_scoring": false,
+    "taint_normalization": true,
+    "description": "Isolated: g-normalize"
+  },
+  "g-taintappr": {
+    "injection_detector": "none",
+    "exfil_control": false,
+    "approvals": true,
+    "risk_scoring": false,
+    "tainted_external_approval": true,
+    "description": "Isolated: g-taintappr"
+  },
+  "g-bulk": {
+    "injection_detector": "none",
+    "exfil_control": false,
+    "approvals": true,
+    "risk_scoring": false,
+    "bulk_read_approval": true,
+    "description": "Isolated: g-bulk"
   }
 }

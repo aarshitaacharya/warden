@@ -166,3 +166,36 @@ def test_repeated_denials_raise_risk(w):
     for i in range(7):
         call(w, tok, "finance:read_report", {"id": "q3-revenue"}, now=NOON + i)
     assert "many_denials" in w.log.rows()[-1]["risk_signals"] or w.log.rows()[-1]["risk_score"] >= 40
+
+
+# --- v4 hardening -------------------------------------------------------------
+def test_digit_normalisation_matches_reformatted_values():
+    from warden.guardrails.taint import TaintState, digit_runs
+    t = TaintState()
+    t.add("hr", {"ssn": "900-15-1234", "salary": 118000}, 3, 0, normalize=True)
+    for payload in ("id 900.15.1234", "nine zero zero one five one two three four", "900 151 234", "pay 118,000"):
+        assert t.overlap(payload, 10, normalize=True), payload
+    assert not t.overlap("invoice 482915, call 415-555-0182", 10, normalize=True)
+    assert digit_runs("one two three") == ["123"]
+
+
+def test_v4_requires_approval_for_external_send_after_sensitive_read_even_for_humans():
+    w = Warden("v4")
+    tok = w.idp.user_token("carol", passkey=True)
+    call(w, tok, "hr:read_record", {"user": "alice"})
+    r = call(w, tok, "comms:send_email", {"to": "x@partner.example", "subject": "s", "body": "totally unrelated"}, now=NOON + 5)
+    assert r.decision == "pending_approval"
+    # outside the 10 minute window it is a normal send
+    r2 = call(w, tok, "comms:send_email", {"to": "x@partner.example", "subject": "s", "body": "later"}, now=NOON + 2000)
+    assert r2.decision == "allow"
+    # v2 has no such rule
+    w2 = Warden("v2"); t2 = w2.idp.user_token("carol", passkey=True)
+    call(w2, t2, "hr:read_record", {"user": "alice"})
+    assert call(w2, t2, "comms:send_email", {"to": "x@partner.example", "subject": "s", "body": "unrelated"}, now=NOON + 5).decision == "allow"
+
+
+def test_v4_bulk_restricted_reads_need_approval():
+    w = Warden("v4")
+    tok = w.idp.user_token("carol", passkey=True)
+    out = [call(w, tok, "hr:read_record", {"user": ["alice", "bob", "dave"][i % 3]}, now=NOON + i * 3) for i in range(30)]
+    assert out[19].decision == "allow" and out[20].decision == "pending_approval"
