@@ -137,9 +137,9 @@ Daily volume more than 3 standard deviations above the identity's own baseline, 
 
 ## Validation by replay
 
-Baseline fidelity: replaying 441 held-out requests against the **current** policy reproduces history with 0 mismatches (this checks the replay itself).
+Baseline fidelity: replaying 438 held-out requests against the **current** policy reproduces history with 0 mismatches (this checks the replay itself).
 
-Proposed policy: **8 of 441** held-out requests would have broken.
+Proposed policy: **8 of 438** held-out requests would have broken.
 
 | identity | action | requests |
 |---|---|---|

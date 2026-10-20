@@ -110,7 +110,9 @@ def _draw(g):
     plt.figure(figsize=(9, 6), facecolor="#fcfcfb")
     nx.draw_networkx_edges(s, pos, edge_color="#c8c7c1", arrows=True, arrowsize=8, width=0.8)
     nx.draw_networkx_nodes(s, pos, node_color=[col[d["kind"]] for _, d in s.nodes(data=True)], node_size=260)
-    nx.draw_networkx_labels(s, pos, labels={n: n.split(":", 1)[1] for n in s}, font_size=6.5, verticalalignment="bottom")
+    lpos = {n: (x, y + 0.06) for n, (x, y) in pos.items()}
+    nx.draw_networkx_labels(s, lpos, labels={n: n.split(":", 1)[1] for n in s}, font_size=7.5,
+                            bbox=dict(fc="#fcfcfb", ec="none", pad=1.0, alpha=0.9))
     plt.title("Effective access: carol and grace via agents to sensitive data and the outside", loc="left", fontsize=10)
     plt.axis("off")
     plt.tight_layout()
