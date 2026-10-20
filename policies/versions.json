@@ -54,5 +54,40 @@
     "approvals": false,
     "risk_scoring": true,
     "description": "Isolated: risk scoring only"
+  },
+  "v1-noappr": {
+    "description": "v1 with approvals off (ablation)",
+    "injection_detector": "heuristic",
+    "exfil_control": true,
+    "approvals": false,
+    "risk_scoring": true
+  },
+  "v2-noappr": {
+    "description": "v2 with approvals off (ablation)",
+    "injection_detector": "classifier",
+    "exfil_control": true,
+    "approvals": false,
+    "risk_scoring": true
+  },
+  "v2-noappr-noexfil": {
+    "description": "v2 with approvals and exfil control off (ablation)",
+    "injection_detector": "classifier",
+    "exfil_control": false,
+    "approvals": false,
+    "risk_scoring": true
+  },
+  "v3": {
+    "description": "v1-shaped stack with a local Ollama LLM judge as the injection detector",
+    "injection_detector": "ollama",
+    "exfil_control": true,
+    "approvals": true,
+    "risk_scoring": true
+  },
+  "g-ollama": {
+    "injection_detector": "ollama",
+    "exfil_control": false,
+    "approvals": false,
+    "risk_scoring": false,
+    "description": "Isolated: Ollama LLM detector only"
   }
 }

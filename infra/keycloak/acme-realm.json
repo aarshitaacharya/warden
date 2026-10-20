@@ -50,6 +50,12 @@
         ],
         "dept": [
           "engineering"
+        ],
+        "device_trusted": [
+          "true"
+        ],
+        "device_id": [
+          "laptop-1"
         ]
       }
     },
@@ -76,6 +82,12 @@
         ],
         "dept": [
           "engineering"
+        ],
+        "device_trusted": [
+          "true"
+        ],
+        "device_id": [
+          "laptop-1"
         ]
       }
     },
@@ -102,6 +114,12 @@
         ],
         "dept": [
           "hr"
+        ],
+        "device_trusted": [
+          "true"
+        ],
+        "device_id": [
+          "laptop-1"
         ]
       }
     },
@@ -128,6 +146,12 @@
         ],
         "dept": [
           "hr"
+        ],
+        "device_trusted": [
+          "true"
+        ],
+        "device_id": [
+          "laptop-1"
         ]
       }
     },
@@ -154,6 +178,12 @@
         ],
         "dept": [
           "finance"
+        ],
+        "device_trusted": [
+          "true"
+        ],
+        "device_id": [
+          "laptop-1"
         ]
       }
     },
@@ -180,6 +210,12 @@
         ],
         "dept": [
           "finance"
+        ],
+        "device_trusted": [
+          "true"
+        ],
+        "device_id": [
+          "laptop-1"
         ]
       }
     },
@@ -207,6 +243,12 @@
         ],
         "dept": [
           "engineering"
+        ],
+        "device_trusted": [
+          "true"
+        ],
+        "device_id": [
+          "laptop-1"
         ]
       }
     },
@@ -234,6 +276,12 @@
         ],
         "dept": [
           "hr"
+        ],
+        "device_trusted": [
+          "true"
+        ],
+        "device_id": [
+          "laptop-1"
         ]
       }
     },
@@ -261,6 +309,12 @@
         ],
         "dept": [
           "finance"
+        ],
+        "device_trusted": [
+          "true"
+        ],
+        "device_id": [
+          "laptop-1"
         ]
       }
     },
@@ -287,6 +341,12 @@
         ],
         "dept": [
           "executive"
+        ],
+        "device_trusted": [
+          "true"
+        ],
+        "device_id": [
+          "laptop-1"
         ]
       }
     }
@@ -301,9 +361,44 @@
         "http://localhost:8000/*"
       ],
       "secret": "gateway-dev-secret",
-      "defaultClientScopes": [
-        "roles",
-        "profile"
+      "directAccessGrantsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "warden-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "warden-gateway",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        },
+        {
+          "name": "device_trusted",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "device_trusted",
+            "claim.name": "device_trusted",
+            "jsonType.label": "boolean",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false"
+          }
+        },
+        {
+          "name": "device_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "device_id",
+            "claim.name": "device_id",
+            "jsonType.label": "String",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false"
+          }
+        }
       ]
     },
     {
@@ -312,7 +407,45 @@
       "publicClient": false,
       "serviceAccountsEnabled": true,
       "standardFlowEnabled": false,
-      "secret": "billing-dev-secret"
+      "secret": "billing-dev-secret",
+      "protocolMappers": [
+        {
+          "name": "warden-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "warden-gateway",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        },
+        {
+          "name": "device_trusted",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "device_trusted",
+            "claim.name": "device_trusted",
+            "jsonType.label": "boolean",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false"
+          }
+        },
+        {
+          "name": "device_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "device_id",
+            "claim.name": "device_id",
+            "jsonType.label": "String",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false"
+          }
+        }
+      ]
     },
     {
       "clientId": "ticket-sync-svc",
@@ -320,7 +453,45 @@
       "publicClient": false,
       "serviceAccountsEnabled": true,
       "standardFlowEnabled": false,
-      "secret": "sync-dev-secret"
+      "secret": "sync-dev-secret",
+      "protocolMappers": [
+        {
+          "name": "warden-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "warden-gateway",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        },
+        {
+          "name": "device_trusted",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "device_trusted",
+            "claim.name": "device_trusted",
+            "jsonType.label": "boolean",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false"
+          }
+        },
+        {
+          "name": "device_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "device_id",
+            "claim.name": "device_id",
+            "jsonType.label": "String",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false"
+          }
+        }
+      ]
     },
     {
       "clientId": "support-agent",
@@ -328,7 +499,45 @@
       "publicClient": false,
       "serviceAccountsEnabled": true,
       "standardFlowEnabled": false,
-      "secret": "support-dev-secret"
+      "secret": "support-dev-secret",
+      "protocolMappers": [
+        {
+          "name": "warden-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "warden-gateway",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        },
+        {
+          "name": "device_trusted",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "device_trusted",
+            "claim.name": "device_trusted",
+            "jsonType.label": "boolean",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false"
+          }
+        },
+        {
+          "name": "device_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "device_id",
+            "claim.name": "device_id",
+            "jsonType.label": "String",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false"
+          }
+        }
+      ]
     },
     {
       "clientId": "hr-assistant",
@@ -336,7 +545,45 @@
       "publicClient": false,
       "serviceAccountsEnabled": true,
       "standardFlowEnabled": false,
-      "secret": "hr-dev-secret"
+      "secret": "hr-dev-secret",
+      "protocolMappers": [
+        {
+          "name": "warden-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "warden-gateway",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        },
+        {
+          "name": "device_trusted",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "device_trusted",
+            "claim.name": "device_trusted",
+            "jsonType.label": "boolean",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false"
+          }
+        },
+        {
+          "name": "device_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "device_id",
+            "claim.name": "device_id",
+            "jsonType.label": "String",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false"
+          }
+        }
+      ]
     },
     {
       "clientId": "research-agent",
@@ -344,7 +591,45 @@
       "publicClient": false,
       "serviceAccountsEnabled": true,
       "standardFlowEnabled": false,
-      "secret": "research-dev-secret"
+      "secret": "research-dev-secret",
+      "protocolMappers": [
+        {
+          "name": "warden-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "warden-gateway",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        },
+        {
+          "name": "device_trusted",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "device_trusted",
+            "claim.name": "device_trusted",
+            "jsonType.label": "boolean",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false"
+          }
+        },
+        {
+          "name": "device_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "device_id",
+            "claim.name": "device_id",
+            "jsonType.label": "String",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false"
+          }
+        }
+      ]
     }
   ]
 }

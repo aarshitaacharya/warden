@@ -15,6 +15,7 @@ jobs:
       - name: Corpus is up to date
         run: |
           python -m eval.corpus
+          python -m eval.corpus_hard
           git diff --exit-code eval/corpus
       - name: Red-team gate (fails if recall drops or false blocks rise)
         run: python -m eval.gate

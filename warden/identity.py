@@ -183,6 +183,7 @@ class Verifier:
         except jwt.PyJWTError as e:
             raise AuthError("invalid_token", str(e))
 
+        claims = self._normalize(claims)
         typ = claims.get("typ")
         if typ == "agent_client" and not allow_agent_client:
             raise AuthError("agent_credential_not_accepted", "agent client credentials are only valid as actor_token")
@@ -208,6 +209,26 @@ class Verifier:
         if why:
             raise AuthError(why)
         return ident
+
+
+    @staticmethod
+    def _normalize(claims: dict) -> dict:
+        """Map Keycloak's token layout onto Warden's claims. Dev/STS tokens already match."""
+        if claims.get("typ") != "Bearer":
+            return claims
+        c = dict(claims)
+        user = c.get("preferred_username", "")
+        client = c.get("azp", "")
+        if user.startswith("service-account-"):
+            if client in acme.AGENTS:
+                c.update(typ="agent_client", sub=client)
+            elif client in acme.SERVICES:
+                c.update(typ="service", sub=client, scope=" ".join(acme.SERVICES[client]["scopes"]))
+            else:
+                c["typ"] = "unknown"
+        else:
+            c.update(typ="user", sub=user)
+        return c
 
 
 class STS:

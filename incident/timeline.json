@@ -142,13 +142,13 @@
         "rule": "DET-004",
         "severity": "medium",
         "identity": "agent:hr-assistant",
-        "evidence": "read restricted data then comms:http_post (6 pairs)"
+        "evidence": "read restricted data then comms:send_email (24 pairs)"
       },
       {
         "rule": "DET-004",
         "severity": "medium",
         "identity": "agent:hr-assistant",
-        "evidence": "read restricted data then comms:send_email (24 pairs)"
+        "evidence": "read restricted data then comms:http_post (6 pairs)"
       }
     ],
     "seconds_attack_start_to_detection": 90.0,

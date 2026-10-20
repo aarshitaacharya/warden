@@ -1,0 +1,121 @@
+{
+"04ace1eafd9418613cf5": [],
+"07650db78987aaf891ce": [],
+"0cbafa88cdfff2a30d9b": [],
+"0ede4431a6d1cb4fde22": [
+"comms:send_email",
+"hr:read_record"
+],
+"10cf914877dc62886f0a": [
+"comms:send_email"
+],
+"1a16916c02da6e3d9bdb": [
+"comms:send_email",
+"docs:write"
+],
+"1fd81d5156b6f6207192": [],
+"205ab558a86230390682": [
+"comms:send_email"
+],
+"255fd8c3a7b7c0bd652b": [],
+"29a450180327ff35cc83": [
+"comms:send_email"
+],
+"2cd2aaafb7f12257005d": [
+"comms:send_email"
+],
+"2d89307262a2ad3e346a": [
+"comms:send_email"
+],
+"359ff07aea6a452a53c0": [],
+"3bfecaa0fa09bca9734f": [
+"comms:send_email"
+],
+"3cefbfdae3f4fdf2dc9e": [],
+"43f28dbbd61c6792ffa2": [
+"comms:http_post"
+],
+"43f8de9bab67b3d43b2a": [],
+"48ed20b15825749de373": [
+"hr:read_record"
+],
+"4961d0550722df0e81ae": [
+"docs:read"
+],
+"4fc7ba968cb14e0b71d1": [],
+"6129607a3e453c0d030b": [],
+"682de7d6dbac266bf21a": [],
+"694997e3c18c6f8d4a0b": [],
+"6a85a6310712a6eec535": [
+"comms:http_post"
+],
+"6b818042527378400cad": [],
+"6bc42c1655d35b0043b5": [],
+"6c4d319f063ecd8d8641": [],
+"6d28eb90aa9a8cbb91ae": [
+"comms:send_email"
+],
+"72a3a11d25dd860dca5e": [],
+"737158b5e841c440817e": [
+"comms:send_email"
+],
+"73b2f7e1f335fba36004": [],
+"74a170e31653cd4d4595": [
+"comms:send_email"
+],
+"774ca73ce85bccd44fb0": [],
+"7a8cf80c61eed80417b3": [],
+"7b6811ade0af8bcacd0d": [
+"comms:http_post"
+],
+"7c9ed40e74e69103be3b": [],
+"88a623958b4704abb021": [
+"hr:read_record"
+],
+"91fce8d0a50f0453bc53": [],
+"9ae0bc629223c7277503": [],
+"9c2d2de69956becfbca8": [],
+"a43369c02cc00710eb33": [
+"comms:send_email"
+],
+"a7630cfc3427fdf51fc2": [],
+"ab7e49c59e180b69dc19": [
+"hr:read_record"
+],
+"afe07a184e1204dd7787": [
+"comms:http_post"
+],
+"b4ba9e2cb82920324c30": [],
+"c24d1bf8a5d6e9e847e8": [],
+"c5a314d0e7d7f494a082": [],
+"cb2fffd9675c037d6c89": [
+"hr:read_record"
+],
+"ce0d9484574267ffc345": [
+"comms:http_post"
+],
+"d14d6ba3097c6aff47fc": [],
+"d2f6bd6768462698f785": [],
+"d78de05d0b0fdc4a5a4a": [
+"comms:send_email"
+],
+"e04524ef94e0602a83fa": [],
+"e2199d87f619498238aa": [
+"docs:read"
+],
+"e71931ca5be16b0a8ad4": [],
+"e961da4402b99d527350": [],
+"ea82d712ed434a1a5685": [
+"comms:send_email"
+],
+"eb5f7e4b7f6b38769488": [
+"comms:http_post"
+],
+"f05851afe4f751550397": [
+"finance:create_payment"
+],
+"f36eb99b07ae793a8642": [
+"comms:send_email"
+],
+"fb9ded8c9eb123d3b32d": []
+}

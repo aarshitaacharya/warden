@@ -129,11 +129,49 @@ class LLMDetector:
         return Detection(bool(out["injection"]), float(out.get("confidence", 0)), self.name, [])
 
 
+class OllamaDetector:
+    """LLM judge served locally by Ollama (free). Results are cached on disk by text hash so
+    evaluation runs are reproducible and fast after the first pass."""
+    name = "ollama"
+    CACHE = None
+
+    def __init__(self, model: str | None = None, host: str | None = None):
+        import hashlib
+        from pathlib import Path
+        self.model = model or os.environ.get("WARDEN_OLLAMA_MODEL", "qwen2.5:7b")
+        self.host = host or os.environ.get("OLLAMA_HOST", "http://localhost:11434")
+        self.cache_path = Path(__file__).resolve().parents[2] / "eval/results" / f"ollama_detector_{self.model.replace(':', '_')}.json"
+        self._h = hashlib.sha256
+        self.cache = json.loads(self.cache_path.read_text()) if self.cache_path.exists() else {}
+
+    def _save(self):
+        self.cache_path.parent.mkdir(exist_ok=True)
+        self.cache_path.write_text(json.dumps(self.cache, indent=0, sort_keys=True))
+
+    def scan(self, text: str) -> Detection:
+        key = self._h(text.encode()).hexdigest()[:20]
+        if key not in self.cache:
+            import httpx
+            r = httpx.post(f"{self.host}/api/chat", timeout=300, json={
+                "model": self.model, "stream": False, "format": "json",
+                "options": {"temperature": 0, "num_predict": 40},
+                "messages": [{"role": "user", "content": LLMDetector.PROMPT % text[:4000]}]})
+            r.raise_for_status()
+            try:
+                out = json.loads(r.json()["message"]["content"])
+                self.cache[key] = [bool(out.get("injection")), float(out.get("confidence", 0) or 0)]
+            except Exception:
+                self.cache[key] = [False, 0.0]
+            self._save()
+        flagged, conf = self.cache[key]
+        return Detection(flagged, conf, self.name, [])
+
+
 _CACHE: dict[str, object] = {}
 
 
 def get_detector(name: str):
     if name not in _CACHE:
         _CACHE[name] = {"none": NoneDetector, "heuristic": HeuristicDetector,
-                        "classifier": NaiveBayesDetector, "llm": LLMDetector}[name]()
+                        "classifier": NaiveBayesDetector, "llm": LLMDetector, "ollama": OllamaDetector}[name]()
     return _CACHE[name]

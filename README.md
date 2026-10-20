@@ -63,7 +63,20 @@ Each guardrail added alone to authorization, scored on the attacks it targets th
 
 A/B v1 vs v2 (paired bootstrap): injection detection +17.5 points, 95% CI [+7.5, +30.0]. The drop in benign false blocks (-3.1 points, CI [-8.2, +1.9]) is not distinguishable from zero on this corpus.
 
-Read the caveats in the report. The corpus was written by the defender, so a score of zero attacks executed shows the layers cover this corpus, not that they cover everything. The per-guardrail numbers are the honest ones.
+### The first corpus was too easy, so there is a second
+
+Zero attacks executing on the first corpus came from overlapping layers and from me writing both the attacks and the detectors. `eval/report_hard.md` runs a held-out set built to evade them (40 attacks, 34 benign tasks):
+
+| | Authorization only | v1 heuristic | v2 classifier | v3 local LLM judge |
+|---|---|---|---|---|
+| Hard attacks executed | 37/40 | 7/40 (17.5%) | 7/40 (17.5%) | 7/40 (17.5%) |
+| Hard benign tasks broken | 0/34 | 10/34 | 8/34 | 0/34 |
+
+The 7 that get through are not injections: insider exfiltration that reformats the value (number formatting, spelled-out digits, paraphrase, chunking, translation) and two low-and-slow scraping runs. Value matching and the behavioural score both miss them, and nothing else covers a human sending external mail. That is an open gap.
+
+Detectors alone, original plus hard sets (scan level): heuristic recall 44.8% / FPR 14.0%; classifier recall 89.6% / FPR 12.9%; local `qwen2.5:7b` judge via Ollama recall 41.8% / FPR 0%. The classifier's high recall is the least trustworthy number here, because I wrote its training data and the attacks. The LLM judge never false-blocks but misses split, dilution and customer-voice payloads entirely.
+
+With a real model as the victim (qwen2.5:7b deciding whether to obey), 30.4% of injection scenarios executed with authorization alone and 0% with any Warden stack. Part of that is the detector and part is taint tracking, so removing approvals and taint (ablation rows in the report) is what exposes the detector's own gaps.
 
 From `analytics/report.md` (simulated month of traffic): agents and users used 12 to 50 percent of the permissions they were granted; the generated least-privilege proposal, learned on 20 days, would have broken 8 of 441 requests in the last 10 days (all one legitimate change in behaviour, caught by replay); 20 agent/user pairs could read sensitive data and send it outside, 0 after the proposal. See `analytics/cloudtrail_report.md` for the same analysis on the public flaws.cloud CloudTrail dataset.
 
@@ -86,8 +99,8 @@ Simulated incident (`docs/incident-postmortem.md`): a stolen agent token read si
 
 ## Known limits
 
-- Device posture and passkey step-up are claims in the token, not real attestation. Keycloak's realm export is provided and the gateway can validate its JWKS, but this repo's tests run against the built-in dev IdP; the Keycloak path has not been exercised end to end.
-- The LLM injection detector (`warden/guardrails/injection.py`, `LLMDetector`) is implemented but not evaluated, to keep the project free to run.
+- Device posture is a user attribute mapped into the token, and passkey step-up is the `acr` claim; neither is real attestation, and no passkey ceremony was run. Authentication, JWKS validation, service accounts and the agent exchange are tested against a live Keycloak (`tests/test_keycloak_integration.py`, skipped when it is not running; `scripts/e2e_keycloak.sh` for the HTTP path).
+- The LLM judge runs locally through Ollama (`WARDEN_OLLAMA_MODEL`, default `qwen2.5:7b`); results are cached in `eval/results/` so reports reproduce without it. A paid-API judge (`LLMDetector`) exists but is not evaluated.
 - The MCP front end calls the engine in process; the tool handlers are not a separate network service.
 - Keys live in process memory.
 

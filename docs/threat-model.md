@@ -104,10 +104,11 @@ so "mitigated" means "stopped in our tests", not "proven".
 | E1 | Role confusion | Mitigated | Authorization alone stopped all 30 confused-deputy and privilege scenarios. |
 | E2 | Agent exceeds its user | Mitigated | Intersection invariant checked in tests and on the attack-path graph. |
 | E3 | Self-approval | Mitigated | All 8 approval-bypass scenarios stopped (self-approval, non-manager, replay, mutated arguments, no passkey). |
-| A1 | Indirect prompt injection | **Partly mitigated** | Heuristic detector caught 57.5% of poisoned outputs, classifier 75%, and both false-block benign security text (8.2% and 5.0% of benign tasks). Detection alone is not trustworthy. |
+| A1 | Indirect prompt injection | **Partly mitigated** | First corpus: heuristic caught 57.5% of poisoned outputs, classifier 75%. Held-out hard set plus first set: heuristic 44.8%, classifier 89.6% (least trustworthy: same author as the attacks), local LLM judge 41.8% with 0 false positives. Split, diluted and request-shaped payloads defeat the LLM judge entirely. A real model obeyed 30% of injections with no Warden. Detection alone is not trustworthy; taint and approvals carry the end-to-end result. |
 | A2 | Confused deputy | Mitigated | 12 scenarios, all denied on the user side. |
 | A3 | Over-privilege | Detected, not prevented | Analytics found unused agent scopes and generated reductions. Applying them is a manual step. |
-| A4 | Exfiltration | **Partly mitigated** | Taint blocked 12 of 15 exfil attacks that authorization alone allowed. Reversed, split and paraphrased values evade it. Approval for agent-originated external sends and risk scoring covered those in the corpus. |
+| A4 | Exfiltration | **Partly mitigated; open gap** | On the hard set, 6 insider-exfiltration variants that reformat the value (number format, spelled digits, paraphrase, chunking, translation) evade taint, and human senders need no approval. 7 of 40 hard attacks still execute. |
+| A4a | (original corpus) | | | Taint blocked 12 of 15 exfil attacks that authorization alone allowed. Reversed, split and paraphrased values evade it. Approval for agent-originated external sends and risk scoring covered those in the corpus. |
 | A5 | Tool-sequence abuse | Partly mitigated | Only the read-then-outbound sequence is modelled. |
 | A6 | Agent token theft | Partly mitigated | 5 minute life and revocation; see S1. |
 
@@ -118,6 +119,10 @@ so "mitigated" means "stopped in our tests", not "proven".
 - **Hash-chain tail truncation** (above).
 - **Simulated victim agent.** Real LLMs may ignore injections the scripted agent obeys, or comply with ones it never sees.
 - **Replay fidelity.** Policy replay approximates context (device, risk) that the log does not store in full.
+
+- **Behavioural score misses low-and-slow.** Scraping 28 HR records at one per 3 seconds from a known device stays under every threshold.
+- **Corpus self-grading.** The first corpus gave 0 executed attacks; the held-out set gave 17.5%. Treat author-written corpora as optimistic.
+- **Keycloak is not Warden's STS.** Keycloak's standard token exchange has no actor claim, so delegation stays in Warden's STS and trusts Keycloak only for human and service identity.
 
 ### Residual risks accepted
 
